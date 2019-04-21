@@ -144,6 +144,8 @@ struct Constants {
         static let busStopDetailCellIdentifier = "BusStopCell"
 
         static let informationCellIdentifier = "InformationCell"
+
+        static let notificationsIdentifier = "NotificationsCell"
     }
 
     /// The empty state messages
@@ -173,6 +175,7 @@ struct Constants {
         static let madeBy = "Made by Cornell App Development"
         static let appDevDescription = "An Engineering Project Team\nat Cornell University"
         static let magicSchoolBus = "Ride on the Magic School Bus"
+        static let notifications = "Notifications"
         static let serviceAlerts = "Service Alerts"
     }
 
@@ -223,14 +226,15 @@ struct Constants {
 
     /// The titles of controllers
     struct Titles {
+        static let aboutUs = "About Us"
         static let allStops = "All Stops"
         static let favorite = "Add Favorite"
         static let favorites = "Add Favorites"
-        static let aboutUs = "About Us"
-        static let serviceAlerts = "TCAT Service Alerts"
+        static let notifications = "Notifications"
         static let routeDetails = "Route Details"
         static let routeOptions = "Route Options"
         static let routeResults = "Route Results"
+        static let serviceAlerts = "TCAT Service Alerts"
     }
 
     struct TodayExtension {

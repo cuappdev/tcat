@@ -27,8 +27,9 @@ class InformationViewController: UIViewController, UITableViewDataSource, UITabl
 
     var content: [[(name: String, action: Selector)]] = [
 
-        [ // Seciton 0
-            (name: Constants.InformationView.serviceAlerts, action: #selector(showServiceAlerts))
+        [ // Section 0
+            (name: Constants.InformationView.serviceAlerts, action: #selector(showServiceAlerts)),
+            (name: Constants.InformationView.notifications, action: #selector(showNotifications))
         ],
 
         [ // Section 1
@@ -294,6 +295,11 @@ class InformationViewController: UIViewController, UITableViewDataSource, UITabl
     @objc func showServiceAlerts() {
         let serviceAlertsVC = ServiceAlertsViewController()
         navigationController?.pushViewController(serviceAlertsVC, animated: true)
+    }
+
+    @objc func showNotifications() {
+        let notificationsVC = NotificationsViewController()
+        navigationController?.pushViewController(notificationsVC, animated: true)
     }
 
     func open(_ url: String, inApp: Bool = true) {

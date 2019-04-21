@@ -45,6 +45,7 @@
 		7E155FD92231DAAF00FE7A9B /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD36A7011F6637C900E4789E /* Direction.swift */; };
 		7E2FFF0F2207B687008EA224 /* TodayExtensionHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E2FFF0E2207B687008EA224 /* TodayExtensionHelpers.swift */; };
 		7E3C5B4122308D83000EFA10 /* LoadingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3C5B4022308D83000EFA10 /* LoadingTableViewCell.swift */; };
+		7E527052226ACDD0008D2F24 /* NotificationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E527051226ACDD0008D2F24 /* NotificationsViewController.swift */; };
 		7E5FE3BC224922C000EF24D4 /* Extensions+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE04A6C21B461D7002F0C52 /* Extensions+Shared.swift */; };
 		7E75BAD621B3A72B00FB56BB /* TodayExtensionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E75BAD521B3A72A00FB56BB /* TodayExtensionCell.swift */; };
 		7E7E4E79218E19C200C72376 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E14AEDC2177E884006A344D /* IntentHandler.swift */; };
@@ -79,6 +80,8 @@
 		7EE04A6421B453E3002F0C52 /* BusLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF456E0220489990005C611D /* BusLocation.swift */; };
 		7EE04A6921B455E0002F0C52 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE04A6721B454F4002F0C52 /* Shared.swift */; };
 		7EE04A6A21B45611002F0C52 /* EventPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94BD30021599E3200C9214E /* EventPayload.swift */; };
+		7EE4632D2268F21C0023C1B4 /* NotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE4632C2268F21C0023C1B4 /* NotificationsTableViewController.swift */; };
+		7EE4632F2268F77B0023C1B4 /* NotificationsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE4632E2268F77B0023C1B4 /* NotificationsTableViewCell.swift */; };
 		7EEB14242231A34200134C8B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99E2F51F6DB06A0073E8F7 /* Constants.swift */; };
 		7EEB14252231A35800134C8B /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF250D7E222FB12300E7F271 /* Endpoints.swift */; };
 		7EEB14262231A37E00134C8B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22948BFB221B75C5003FC43F /* Models.swift */; };
@@ -228,9 +231,12 @@
 		7E14AEDE2177E884006A344D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E2FFF0E2207B687008EA224 /* TodayExtensionHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayExtensionHelpers.swift; sourceTree = "<group>"; };
 		7E3C5B4022308D83000EFA10 /* LoadingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingTableViewCell.swift; sourceTree = "<group>"; };
+		7E527051226ACDD0008D2F24 /* NotificationsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationsViewController.swift; path = Controllers/NotificationsViewController.swift; sourceTree = "<group>"; };
 		7E75BAD521B3A72A00FB56BB /* TodayExtensionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TodayExtensionCell.swift; sourceTree = "<group>"; };
 		7EE04A6721B454F4002F0C52 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Shared.swift; path = Utilities/Shared.swift; sourceTree = "<group>"; };
 		7EE04A6C21B461D7002F0C52 /* Extensions+Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Extensions+Shared.swift"; sourceTree = "<group>"; };
+		7EE4632C2268F21C0023C1B4 /* NotificationsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationsTableViewController.swift; path = Controllers/NotificationsTableViewController.swift; sourceTree = "<group>"; };
+		7EE4632E2268F77B0023C1B4 /* NotificationsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationsTableViewCell.swift; path = Cells/NotificationsTableViewCell.swift; sourceTree = "<group>"; };
 		7EEF189B21B39C6200343FFD /* Today Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Today Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EEF189C21B39C6200343FFD /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		7EEF189F21B39C6200343FFD /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
@@ -547,6 +553,7 @@
 				2292486D21BB82180004279C /* ServiceAlertTableViewCell.swift */,
 				503EC37C1E969ADF00B3D4D4 /* PlaceTableViewCell.swift */,
 				DDB49C961E8857E000A99C35 /* SmallDetailTableViewCell.swift */,
+				7EE4632E2268F77B0023C1B4 /* NotificationsTableViewCell.swift */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -630,6 +637,8 @@
 				DD2F98A21E5150990005F6BC /* RouteOptionsViewController.swift */,
 				503EC37E1E969B2100B3D4D4 /* SearchResultsTableViewController.swift */,
 				2292486B21B8ECB90004279C /* ServiceAlertsViewController.swift */,
+				7EE4632C2268F21C0023C1B4 /* NotificationsTableViewController.swift */,
+				7E527051226ACDD0008D2F24 /* NotificationsViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -1099,9 +1108,11 @@
 				7E0A65192226367100441967 /* WalkPath.swift in Sources */,
 				DDB49C9A1E8857E000A99C35 /* BusStopTableViewCell.swift in Sources */,
 				7EBD9D94222630E4008BF900 /* Extensions+Shared.swift in Sources */,
+				7EE4632F2268F77B0023C1B4 /* NotificationsTableViewCell.swift in Sources */,
 				DC2E96461FC21B29009955C6 /* HeaderView.swift in Sources */,
 				DD87F20A1E878CB5000C244B /* Loader.swift in Sources */,
 				DD3D9C211F94297100B164D4 /* Reachability.swift in Sources */,
+				7E527052226ACDD0008D2F24 /* NotificationsViewController.swift in Sources */,
 				DDBFEAA11E787008002BBD96 /* RouteSelectionView.swift in Sources */,
 				222BDE16215C1CEE0040DD93 /* WhatsNewHeaderView.swift in Sources */,
 				BF250D7F222FB12400E7F271 /* Endpoints.swift in Sources */,
@@ -1123,6 +1134,7 @@
 				7EBD9D8B22263096008BF900 /* Place.swift in Sources */,
 				DDBFEAA01E787008002BBD96 /* DatePickerView.swift in Sources */,
 				DDC83CA51E52B0D400D4EDDF /* RouteTableViewCell.swift in Sources */,
+				7EE4632D2268F21C0023C1B4 /* NotificationsTableViewController.swift in Sources */,
 				DCB717101FB76EA600BE4D26 /* AllStopsTableViewController.swift in Sources */,
 				7EBD9D9E22263120008BF900 /* WalkWithDistanceIcon.swift in Sources */,
 				449A7C791D80D0E80019300C /* AppDelegate.swift in Sources */,
