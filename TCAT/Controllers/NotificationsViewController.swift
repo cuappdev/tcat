@@ -72,6 +72,7 @@ extension NotificationsViewController: UITableViewDataSource {
 
         cell.setUpTimeLabel()
         cell.setUpDepartureLabel()
+        cell.setUpLiveElements()
         cell.layer.cornerRadius = 6.0
         cell.layer.masksToBounds = true
         cell.selectionStyle = .none

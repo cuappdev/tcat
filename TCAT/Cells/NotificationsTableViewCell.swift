@@ -14,6 +14,8 @@ class NotificationsTableViewCell: UITableViewCell {
     // MARK: Data vars
     var route: Route!
     var busDirection: Direction?
+    var showLiveElements: Bool = true
+    var departureStop: String = ""
 
     // MARK: View vars
     var timeLabel = UILabel()
@@ -34,11 +36,9 @@ class NotificationsTableViewCell: UITableViewCell {
 
         contentView.addSubview(timeLabel)
         timeLabel.snp.makeConstraints { make in
-            let bottom: CGFloat = 76.0
-
             make.leading.equalToSuperview().inset(inset)
             make.trailing.lessThanOrEqualToSuperview().inset(inset)
-            make.height.equalTo(16.0)
+            // make.height.equalTo(16.0)
             make.top.equalToSuperview().inset(inset)
         }
 
@@ -54,31 +54,36 @@ class NotificationsTableViewCell: UITableViewCell {
         }
 
         activeSwitch.onTintColor = Colors.tcatBlue
-        activeSwitch.transform = CGAffineTransform(scaleX: 0.673, y: 0.645)
+        activeSwitch.transform = CGAffineTransform(scaleX: 0.675, y: 0.675)
         contentView.addSubview(activeSwitch)
         activeSwitch.snp.makeConstraints { make in
-            let top: CGFloat = 43.0
-            let bottom: CGFloat = 43.94
-            let leading: CGFloat = 246.0
-
-            make.leading.equalTo(busIcon.snp.trailing).offset(leading)
-            make.top.equalToSuperview().inset(top)
-            make.trailing.equalToSuperview().inset(inset)
-            make.bottom.equalToSuperview().inset(bottom)
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-4)
         }
 
         contentView.addSubview(departureLabel)
         departureLabel.snp.makeConstraints { make in
-            let top: CGFloat = 41.0
-            let bottom: CGFloat = 34.0
-
             make.leading.equalTo(busIcon.snp.trailing).offset(inset)
-            make.trailing.equalTo(activeSwitch.snp.leading).inset(inset)
-            make.top.equalToSuperview().inset(top)
-            make.bottom.equalToSuperview().inset(bottom)
+            make.trailing.equalTo(activeSwitch.snp.leading).offset(-2)
+            make.top.equalTo(busIcon)
         }
 
-//        contentView.addSubview(liveLabel)  -- need ifShowLiveElements
+        contentView.addSubview(liveLabel)
+        contentView.addSubview(liveIndicator)
+        if showLiveElements {
+            liveLabel.snp.makeConstraints { make in
+                make.bottom.equalToSuperview().inset(inset)
+                make.leading.equalTo(departureLabel)
+            }
+
+            liveIndicator.snp.makeConstraints { make in
+                let offset: CGFloat = 6.0
+
+                make.centerY.equalTo(liveLabel.snp.centerY)
+                make.leading.equalTo(liveLabel.snp.trailing).offset(offset)
+                make.height.equalTo(liveIndicator.intrinsicContentSize.height)
+            }
+        }
     }
 
     func configure(route: Route) {
@@ -134,13 +139,31 @@ class NotificationsTableViewCell: UITableViewCell {
     }
 
     func setUpDepartureLabel() {
-        departureLabel.font = UIFont.getFont(.regular, size: 16.0)
+        departureLabel.font = UIFont.getFont(.regular, size: 14.0)
         departureLabel.textColor = Colors.black
         departureLabel.numberOfLines = 2
         departureLabel.lineBreakMode = .byWordWrapping
+        
+        let normalText = "Depart from "
+        let normalAttrs = [NSAttributedString.Key.font : UIFont.getFont(.regular, size: 14.0)]
+        let string = NSMutableAttributedString(string: normalText, attributes: normalAttrs)
+        
+        // let boldText = departureStop
+        let boldText  = "Schwartz Performing Arts Center"
+        let boldAttrs = [NSAttributedString.Key.font : UIFont.getFont(.semibold, size: 14.0)]
+        let boldString = NSMutableAttributedString(string: boldText, attributes: boldAttrs)
+        
+        string.append(boldString)
+        
+        departureLabel.attributedText = string
+    }
 
-        // departureLabel.text = "Depart from \(busDirection?.name ?? "no bus to destination")"
-        departureLabel.text = "Depart from Schwartz Performing Arts Center"
+    func setUpLiveElements() {
+        liveLabel.font = .getFont(.medium, size: 14.0)
+        liveLabel.textColor = Colors.liveGreen
+        liveLabel.text = "Board in 5 min"
+
+        liveIndicator.setColor(to: Colors.liveGreen)
     }
 
     required init?(coder aDecoder: NSCoder) {
