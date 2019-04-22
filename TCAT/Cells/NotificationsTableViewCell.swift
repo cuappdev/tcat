@@ -143,18 +143,18 @@ class NotificationsTableViewCell: UITableViewCell {
         departureLabel.textColor = Colors.black
         departureLabel.numberOfLines = 2
         departureLabel.lineBreakMode = .byWordWrapping
-        
+
         let normalText = "Depart from "
-        let normalAttrs = [NSAttributedString.Key.font : UIFont.getFont(.regular, size: 14.0)]
+        let normalAttrs = [NSAttributedString.Key.font: UIFont.getFont(.regular, size: 14.0)]
         let string = NSMutableAttributedString(string: normalText, attributes: normalAttrs)
-        
+
         // let boldText = departureStop
         let boldText  = "Schwartz Performing Arts Center"
-        let boldAttrs = [NSAttributedString.Key.font : UIFont.getFont(.semibold, size: 14.0)]
+        let boldAttrs = [NSAttributedString.Key.font: UIFont.getFont(.semibold, size: 14.0)]
         let boldString = NSMutableAttributedString(string: boldText, attributes: boldAttrs)
-        
+
         string.append(boldString)
-        
+
         departureLabel.attributedText = string
     }
 

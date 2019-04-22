@@ -13,6 +13,7 @@ import DZNEmptyDataSet
 class NotificationsViewController: UIViewController {
 
     var table: UITableView = UITableView()
+    var notifications: [Route] = []
 
     // MARK: Spacing vars
     let spacing: CGFloat = 12.0
@@ -25,6 +26,7 @@ class NotificationsViewController: UIViewController {
         navigationController?.navigationBar.tintColor = Colors.primaryText
 
         navigationItem.setRightBarButton(self.editButtonItem, animated: false)
+        self.editButtonItem.action = #selector(showEditing)
         let buttonTitleTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.getFont(.regular, size: 18),
             .foregroundColor: Colors.tcatBlue
@@ -38,6 +40,16 @@ class NotificationsViewController: UIViewController {
         table.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(spacing)
             make.top.bottom.equalToSuperview()
+        }
+    }
+
+    @objc func showEditing() {
+        if(table.isEditing == true) {
+            table.isEditing = false
+            self.navigationItem.rightBarButtonItem?.title = "Edit"
+        } else {
+            table.isEditing = true
+            self.navigationItem.rightBarButtonItem?.title = "Done"
         }
     }
 
@@ -90,7 +102,10 @@ extension NotificationsViewController: UITableViewDelegate {
 
         table.backgroundColor = UIColor.clear
         table.separatorStyle = .none
+
+        table.isEditing = false
     }
+
 }
 
 extension NotificationsViewController: DZNEmptyDataSetSource {
