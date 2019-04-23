@@ -26,7 +26,7 @@ class NotificationsViewController: UIViewController {
         navigationController?.navigationBar.tintColor = Colors.primaryText
 
         navigationItem.setRightBarButton(self.editButtonItem, animated: false)
-        self.editButtonItem.action = #selector(showEditing)
+        self.editButtonItem.action = #selector(editSelected)
         let buttonTitleTextAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.getFont(.regular, size: 18),
             .foregroundColor: Colors.tcatBlue
@@ -43,13 +43,25 @@ class NotificationsViewController: UIViewController {
         }
     }
 
-    @objc func showEditing() {
+    @objc func editSelected() {
         if(table.isEditing == true) {
             table.isEditing = false
-            self.navigationItem.rightBarButtonItem?.title = "Edit"
+//            self.navigationItem.rightBarButtonItem?.title = "Edit"
+//            table.snp.removeConstraints()
+//            table.snp.makeConstraints { make in
+//                make.leading.trailing.equalToSuperview().inset(spacing)
+//                make.top.bottom.equalToSuperview()
+//            }
         } else {
             table.isEditing = true
+//            table.snp.removeConstraints()
+//            table.snp.makeConstraints { make in
+//                make.leading.equalToSuperview().inset(46.0)
+//                make.trailing.equalToSuperview().offset(22.0)
+//                make.top.bottom.equalToSuperview()
+//            }
             self.navigationItem.rightBarButtonItem?.title = "Done"
+
         }
     }
 
