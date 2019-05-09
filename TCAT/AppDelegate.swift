@@ -15,6 +15,7 @@ import Fabric
 import Crashlytics
 import SafariServices
 import WhatsNewKit
+import UserNotifications
 
 // This is used for app-specific preferences
 let userDefaults = UserDefaults.standard
@@ -92,6 +93,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 Analytics.shared.log(payload)
             }
         }
+
+        // Register for Push Notifications
+        registerForPushNotifications()
 
         // Initalize window without storyboard
         self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -379,4 +383,46 @@ extension UIWindow {
         (rootViewController as? UINavigationController)?.visibleViewController?.present(viewController, animated: true)
     }
 
+}
+
+// MARK: - Push Notifications
+extension AppDelegate {
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+        ) {
+        // Convert deviceToken to string
+        let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
+        let token = tokenParts.joined()
+        print("Device Token: \(token)")
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register: \(error)")
+    }
+
+    /// Register for Push Notifications
+    private func registerForPushNotifications() {
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound, .badge]) {
+                [weak self] granted, error in
+                print("Permission granted: \(granted)")
+                guard granted else { return }
+                self?.getNotificationSettings()
+        }
+    }
+
+    /// Check current notification settings
+    private func getNotificationSettings() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            print("Notification settings: \(settings)")
+            guard settings.authorizationStatus == .authorized else { return }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+    }
 }
