@@ -156,7 +156,7 @@ class OnboardingViewController: PresentationController {
 
         if isInitialViewing {
 
-            let rootVC = HomeViewController()
+            let rootVC = HomeMapViewController()
             let desiredViewController = CustomNavigationController(rootViewController: rootVC)
 
             let appDelegate = UIApplication.shared.delegate as! AppDelegate

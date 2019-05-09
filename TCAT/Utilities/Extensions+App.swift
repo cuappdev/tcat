@@ -10,7 +10,6 @@ import UIKit
 import MapKit
 import SwiftyJSON
 import CoreLocation
-import TRON
 
 let increaseTapTargetTag: Int = 1865
 
@@ -103,6 +102,20 @@ extension UIViewController {
         }
     }
 
+    func add(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+    }
+
+    func remove() {
+        guard parent != nil else {
+            return
+        }
+        willMove(toParent: nil)
+        removeFromParent()
+        view.removeFromSuperview()
+    }
 }
 
 extension String {
@@ -184,23 +197,6 @@ extension Array where Element: Comparable {
     }
 }
 
-extension Array: JSONDecodable {
-    public init(json: JSON) {
-        self.init(json.arrayValue.compactMap {
-            if let type = Element.self as? JSONDecodable.Type {
-                let element: Element?
-                do {
-                    element = try type.init(json: $0) as? Element
-                } catch {
-                    return nil
-                }
-                return element
-            }
-            return nil
-        })
-    }
-}
-
 /// Present a share sheet for a route in any context.
 func presentShareSheet(from view: UIView, for route: Route, with image: UIImage? = nil) {
 
@@ -239,19 +235,6 @@ public func ???<T> (optional: T?, defaultValue: @autoclosure () -> String) -> St
     case let value?: return String(describing: value)
     case nil: return defaultValue()
     }
-}
-
-func sortFilteredBusStops(busStops: [Place], letter: Character) -> [Place] {
-    var nonLetterArray = [Place]()
-    var letterArray = [Place]()
-    for stop in busStops {
-        if stop.name.first! == letter {
-            letterArray.append(stop)
-        } else {
-            nonLetterArray.append(stop)
-        }
-    }
-    return letterArray + nonLetterArray
 }
 
 extension Collection {

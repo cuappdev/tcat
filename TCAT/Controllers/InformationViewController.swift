@@ -71,7 +71,7 @@ class InformationViewController: UIViewController, UITableViewDataSource, UITabl
         hiddenLabel.textAlignment = .center
         hiddenLabel.backgroundColor = .clear
         hiddenLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(topLayoutGuide.snp.bottom).offset(86)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(86)
             make.centerX.equalToSuperview()
             make.height.equalTo(20)
         }
@@ -81,7 +81,7 @@ class InformationViewController: UIViewController, UITableViewDataSource, UITabl
         tcatImage.isUserInteractionEnabled = true
         tcatImage.snp.makeConstraints { (make) in
             make.centerX.equalToSuperview()
-            make.top.equalTo(topLayoutGuide.snp.bottom).offset(44)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(44)
             make.width.equalTo(tcatImage.snp.height).multipliedBy(2.5)
             make.leading.equalToSuperview().offset(40)
             make.trailing.equalToSuperview().offset(-40)

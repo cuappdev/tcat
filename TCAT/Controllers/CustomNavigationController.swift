@@ -136,7 +136,7 @@ class CustomNavigationController: UINavigationController, UINavigationController
     override func popViewController(animated: Bool) -> UIViewController? {
 
         let viewController = super.popViewController(animated: animated)
-        if let lastViewController = viewControllers.last as? HomeViewController {
+        if let lastViewController = viewControllers.last as? HomeMapViewController {
             lastViewController.navigationItem.leftBarButtonItem = nil
         }
         return viewController

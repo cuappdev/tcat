@@ -18,6 +18,7 @@ class Analytics {
         #if !DEBUG
             let fabricEvent = payload.convertToFabric()
             Answers.logCustomEvent(withName: fabricEvent.name, customAttributes: fabricEvent.attributes)
+
             print("Logging \(fabricEvent.name):", fabricEvent.attributes ?? [:])
         #endif
     }

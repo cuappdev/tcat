@@ -8,21 +8,25 @@
 
 import UIKit
 import DZNEmptyDataSet
+import FutureNova
 
-class FavoritesTableViewController: UITableViewController {
+class FavoritesTableViewController: UIViewController {
 
     var fromOnboarding = false
     var timer: Timer?
     var searchBar = UISearchBar()
-    var resultsSection: Section! {
+    var tableView: UITableView!
+    var resultsSection = Section(type: .searchResults, items: [Place]()) {
         didSet {
             tableView.reloadData()
         }
     }
+    private let networking: Networking = URLSession.shared.request
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = Colors.white
         title = fromOnboarding ? Constants.Titles.favorites : Constants.Titles.favorite
         let systemItem: UIBarButtonItem.SystemItem = fromOnboarding ? .done : .cancel
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: systemItem,
@@ -32,14 +36,30 @@ class FavoritesTableViewController: UITableViewController {
             CustomNavigationController.buttonTitleTextAttributes, for: .normal
         )
 
-        resultsSection = Section(type: .searchResults, items: [Place]())
+        setupTableView()
+        setupConstraints()
+    }
 
+    func setupTableView() {
+        tableView = UITableView(frame: .zero)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.keyboardDismissMode = .onDrag
         tableView.register(PlaceTableViewCell.self, forCellReuseIdentifier: Constants.Cells.placeIdentifier)
         tableView.emptyDataSetSource = self
-        //tableView.emptyDataSetDelegate = self
         tableView.tableFooterView = UIView()
-        tableView.reloadEmptyDataSet()
+        view.addSubview(tableView)
+    }
 
+    func setupConstraints() {
+        tableView.snp.makeConstraints { (make) in
+            make.leading.trailing.bottom.equalToSuperview()
+            if #available(iOS 11.0, *) {
+                make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            } else {
+                make.top.equalTo(self.topLayoutGuide.snp.bottom)
+            }
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -47,9 +67,10 @@ class FavoritesTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         searchBar.becomeFirstResponder()
+        tableView.reloadEmptyDataSet()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -57,9 +78,13 @@ class FavoritesTableViewController: UITableViewController {
         searchBar.endEditing(true)
     }
 
+    private func getSearchResults (searchText: String) -> Future<Response<[Place]>> {
+        return networking(Endpoint.getSearchResults(searchText: searchText)).decode()
+    }
+
     @objc func dismissVC() {
         if fromOnboarding {
-            let rootVC = HomeViewController()
+            let rootVC = HomeMapViewController()
             let desiredViewController = CustomNavigationController(rootViewController: rootVC)
 
             if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
@@ -81,17 +106,29 @@ class FavoritesTableViewController: UITableViewController {
             dismiss(animated: true)
         }
     }
+}
 
-    // MARK: - Table view data source
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+// MARK: - Table view data source
+extension FavoritesTableViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return resultsSection.items.count
     }
 
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.Cells.placeIdentifier, for: indexPath) as! PlaceTableViewCell
+        cell.place = resultsSection.items[indexPath.row]
+        cell.layoutSubviews()
+        return cell
+    }
+}
+
+// MARK: - Table view delegate
+extension FavoritesTableViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50.0
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         searchBar.isTranslucent = true
         searchBar.placeholder = Constants.General.favoritesPlaceholder
         searchBar.backgroundImage = UIImage()
@@ -103,22 +140,11 @@ class FavoritesTableViewController: UITableViewController {
         return searchBar
     }
 
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 50.0
     }
 
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50.0
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.Cells.placeIdentifier, for: indexPath) as! PlaceTableViewCell
-        cell.place = resultsSection.items[indexPath.row]
-        cell.layoutSubviews()
-        return cell
-    }
-
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let cell = tableView.cellForRow(at: indexPath)
         cell?.accessoryView = UIActivityIndicatorView()
         tableView.deselectRow(at: indexPath, animated: true)
@@ -133,10 +159,10 @@ class FavoritesTableViewController: UITableViewController {
                 if error != nil {
                     print("Unable to get coordinates to save favorite.")
                     cell?.accessoryView = nil
-                    let title = Constants.Alerts.GooglePlacesFailure.title
-                    let message = Constants.Alerts.GooglePlacesFailure.message
+                    let title = Constants.Alerts.PlacesFailure.title
+                    let message = Constants.Alerts.PlacesFailure.message
                     let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                    let done = UIAlertAction(title: Constants.Alerts.GooglePlacesFailure.action, style: .default)
+                    let done = UIAlertAction(title: Constants.Alerts.PlacesFailure.action, style: .default)
                     alertController.addAction(done)
                     self.present(alertController, animated: true, completion: nil)
                 } else {
@@ -147,9 +173,7 @@ class FavoritesTableViewController: UITableViewController {
                 }
             }
         }
-
     }
-
 }
 
 // MARK: Empty Data Set
@@ -183,18 +207,25 @@ extension FavoritesTableViewController: UISearchBarDelegate {
     @objc func getPlaces(timer: Timer) {
         let searchText = (timer.userInfo as! [String: String])["searchText"]!
         if !searchText.isEmpty {
-            Network.getSearchResults(searchText: searchText).perform(withSuccess: { (searchRequest) in
-                if searchRequest.success {
-                    self.resultsSection = Section(type: .searchResults, items: searchRequest.data)
-                    self.tableView.contentOffset = .zero
-                } else {
-                    print("[FavoritesTableViewController] success:", searchRequest.success)
-                    self.resultsSection = Section(type: .searchResults, items: [Place]())
+            getSearchResults(searchText: searchText).observe { [weak self] result in
+                guard let `self` = self else { return }
+                DispatchQueue.main.async {
+                    switch result {
+                    case .value(let response):
+                        if response.success {
+                            self.resultsSection = Section(type: .searchResults, items: response.data)
+                            self.tableView.contentOffset = .zero
+                        } else {
+                            print("[FavoritesTableViewController] success:", response.success)
+                            self.resultsSection = Section(type: .searchResults, items: [Place]())
+                        }
+                    case .error(let error):
+                        print("[FavoritesTableViewController] getSearchResults Error: \(error.localizedDescription)")
+                        self.resultsSection = Section(type: .searchResults, items: [Place]())
+
+                    }
                 }
-            }, failure: { (error) in
-                print("[FavoritesTableViewController] getSearchResults Error:", error.errorDescription ?? "")
-                self.resultsSection = Section(type: .searchResults, items: [Place]())
-            })
+            }
         } else {
             resultsSection = Section(type: .searchResults, items: [Place]())
         }

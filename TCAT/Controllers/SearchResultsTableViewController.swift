@@ -8,10 +8,10 @@
 
 import UIKit
 import SwiftyJSON
-import Alamofire
 import CoreLocation
 import DZNEmptyDataSet
 import Crashlytics
+import FutureNova
 
 protocol DestinationDelegate: class {
     func didSelectPlace(place: Place)
@@ -42,6 +42,7 @@ class SearchResultsTableViewController: UITableViewController {
     var shouldShowCurrentLocation = true
     var returningFromAllStopsTVC = false
     var returningFromAllStopsBusStop: Place?
+    private let networking: Networking = URLSession.shared.request
 
     var sections: [Section] = [] {
         didSet {
@@ -129,6 +130,10 @@ class SearchResultsTableViewController: UITableViewController {
         return allSections.filter { !$0.items.isEmpty }
     }
 
+    private func getSearchResults (searchText: String) -> Future<Response<[Place]>> {
+        return networking(Endpoint.getSearchResults(searchText: searchText)).decode()
+    }
+
     /* Keyboard Functions */
     @objc func keyboardWillShow(_ notification: Notification) {
         isKeyboardVisible = true
@@ -159,9 +164,9 @@ class SearchResultsTableViewController: UITableViewController {
 
         switch sections[section].type {
         case .recentSearches:
-            header.setupView(labelText: Constants.TableHeaders.recentSearches, displayAddButton: false)
+            header.setupView(labelText: Constants.TableHeaders.recentSearches, buttonType: .clear)
         case .favorites:
-            header.setupView(labelText: Constants.TableHeaders.favoriteDestinations, displayAddButton: false)
+            header.setupView(labelText: Constants.TableHeaders.favoriteDestinations, buttonType: .add)
         case .seeAllStops, .searchResults:
             return nil
         default:
@@ -274,13 +279,20 @@ extension SearchResultsTableViewController: UISearchBarDelegate, UISearchResults
     @objc func getPlaces(timer: Timer) {
         let searchText = (timer.userInfo as! [String: String])["searchText"]!
         if !searchText.isEmpty {
-            Network.getSearchResults(searchText: searchText).perform(withSuccess: { response in
-                self.searchResultsSection = Section(type: .searchResults, items: response.data)
-                self.sections = self.searchResultsSection.items.isEmpty ? [] : [self.searchResultsSection]
-                if !self.sections.isEmpty {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+            getSearchResults(searchText: searchText).observe { [weak self] result in
+                guard let `self` = self else { return }
+                DispatchQueue.main.async {
+                    switch result {
+                    case .value(let response):
+                        self.searchResultsSection = Section(type: .searchResults, items: response.data)
+                        self.sections = self.searchResultsSection.items.isEmpty ? [] : [self.searchResultsSection]
+                        if !self.sections.isEmpty {
+                            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        }
+                    default: break
+                    }
                 }
-            })
+            }
         } else {
             sections = createSections()
         }

@@ -18,7 +18,7 @@ enum BusDataType: String, Codable {
     case invalidData
 }
 
-class BusLocation: NSObject, Decodable {
+class BusLocation: NSObject, Codable {
 
     var dataType: BusDataType
     var destination: String

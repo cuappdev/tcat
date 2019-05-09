@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '10.0'
+platform :ios, '11.0'
 
 # Comment this line if you're not using Swift and don't want to use dynamic frameworks
 
@@ -10,17 +10,16 @@ inhibit_all_warnings!
 target 'TCAT' do
     
     # Location
-    pod 'GoogleMaps', '~> 2.6'
-    pod 'GooglePlaces', '~> 2.6'
+    pod 'GoogleMaps', '~> 3.1'
+    pod 'GooglePlaces', '~>  3.1'
     
     # Networking + Data
-    pod 'Alamofire', '~> 4.7'
-    pod 'TRON', '~> 4.1.2'
-    pod 'SwiftyJSON', '~> 4.0'
+    pod 'SwiftyJSON', '~> 5.0'
+    pod 'FutureNova', :git => 'https://github.com/cuappdev/ios-networking.git'
     
     # Analytics
-    pod 'Crashlytics', '~> 3.10'
-    pod 'Fabric'
+    pod 'Crashlytics', '~> 3.12'
+    pod 'Fabric', '~> 1.9'
     pod 'Firebase/Core'
     
     # File Management
@@ -29,10 +28,10 @@ target 'TCAT' do
     # UI Frameworks
     pod 'DZNEmptyDataSet', :git=> 'https://github.com/cuappdev/DZNEmptyDataSet.git'
     pod 'NotificationBannerSwift', :git=> 'https://github.com/cuappdev/NotificationBanner.git'
-    pod 'Pulley', '~> 2.6'
+    pod 'Pulley', '~> 2.7'
     pod 'Presentation', :git=> 'https://github.com/cuappdev/Presentation.git'
-    pod 'SnapKit'
-    pod 'WhatsNewKit', '~> 1.1.2'
+    pod 'SnapKit', '~> 5.0'
+    pod 'WhatsNewKit', '~> 1.1'
 
     # Other
     pod 'SwiftLint'
@@ -46,6 +45,7 @@ target 'TCAT' do
         inherit! :search_paths
         # Pods for testing
     end
+    
 end
 
 # Pods for Today Extension
@@ -53,13 +53,22 @@ target 'Today Extension' do
     # Pods for Today Extension
 
     # UI Frameworks	
-    pod 'SnapKit'
+    pod 'SnapKit', '~> 5.0'
 
     # Networking + Data
-    pod 'TRON', '~> 4.1.2'
-    pod 'Alamofire', '~> 4.7'
-    pod 'SwiftyJSON', '~> 4.0'
+    pod 'SwiftyJSON', '~> 5.0'
+    pod 'FutureNova', :git => 'https://github.com/cuappdev/ios-networking.git'
  
     # Analytics
-    pod 'Crashlytics', '~> 3.10'
-end 
+    pod 'Crashlytics', '~> 3.12'
+    
+end
+
+# Added for NotificationBannerSwift build issue
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
+    end
+  end
+end

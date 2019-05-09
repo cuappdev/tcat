@@ -13,8 +13,8 @@ import DZNEmptyDataSet
 import NotificationBannerSwift
 import Crashlytics
 import Pulley
-import TRON
 import Intents
+import FutureNova
 
 enum SearchBarType: String {
     case from, to
@@ -70,7 +70,8 @@ class RouteOptionsViewController: UIViewController {
 
     // MARK: Reachability vars
 
-    let reachability: Reachability? = Reachability(hostname: Network.ipAddress)
+    let reachability: Reachability? = Reachability(hostname: Endpoint.config.host ?? "")
+    private let networking: Networking = URLSession.shared.request
 
     var banner: StatusBarNotificationBanner? {
         didSet {
@@ -404,18 +405,24 @@ class RouteOptionsViewController: UIViewController {
             }
 
             // MARK: Search for Routes Data Request
-
-            Network.getRoutes(start: searchFrom, end: searchTo, time: time, type: self.searchTimeType) { request in
-                let requestURL = Network.getRequestURL(start: searchFrom, end: searchTo, time: time, type: self.searchTimeType)
-                self.processRequest(request: request, requestURL: requestURL, endPlace: searchTo)
+            if let result =  getRoutes(start: searchFrom, end: searchTo, time: time, type: self.searchTimeType) {
+                result.observe(with: { [weak self] result in
+                    guard let `self` = self else { return }
+                    DispatchQueue.main.async {
+                        let requestURL = Endpoint.getRequestURL(start: searchFrom, end: searchTo, time: time, type: self.searchTimeType)
+                        self.processRequest(result: result, requestURL: requestURL, endPlace: searchTo)
+                    }
+                })
             }
 
             // Donate GetRoutes intent
             if #available(iOS 12.0, *) {
                 let intent = GetRoutesIntent()
                 intent.searchTo = searchTo.name
-                intent.latitude = String(describing: searchTo.latitude)
-                intent.longitude = String(describing: searchTo.longitude)
+                if let latitude = searchTo.latitude, let longitude = searchTo.longitude {
+                    intent.latitude = String(describing: latitude)
+                    intent.longitude = String(describing: longitude)
+                }
                 intent.suggestedInvocationPhrase = "Find bus to \(searchTo.name)"
                 let interaction = INInteraction(intent: intent, response: nil)
                 interaction.donate(completion: { (error) in
@@ -428,52 +435,66 @@ class RouteOptionsViewController: UIViewController {
 
     }
 
-    func processRequest(request: APIRequest<RoutesRequest, Error>, requestURL: String, endPlace: Place) {
-        JSONFileManager.shared.logURL(timestamp: Date(), urlName: "Route requestUrl", url: requestURL)
+    private func getRoutes(start: Place,
+                           end: Place,
+                           time: Date,
+                           type: SearchType) -> Future<Response<RouteSectionsObject>>? {
+        if let endpoint = Endpoint.getRoutes(start: start, end: end, time: time, type: type) {
+            return networking(endpoint).decode()
+        } else { return nil }
+    }
 
-        request.performCollectingTimeline { (response) in
-
-            switch response.result {
-            case .success(let routesResponse):
-
-                // Save to JSONFileManager
-                if let data = response.data {
-                    do { try JSONFileManager.shared.saveJSON(JSON.init(data: data), type: .routeJSON) } catch let error {
-                        let fileName = "RouteOptionsViewController"
-                        let line = "\(fileName) \(#function): \(error.localizedDescription)"
-                        print(line)
-                    }
-                }
-
-                // Parse sections of routes
-                [routesResponse.data.fromStop, routesResponse.data.boardingSoon, routesResponse.data.walking]
-                    .forEach { (routeSection) in
-                        routeSection.forEach { (route) in
-                            route.formatDirections(start: self.searchFrom?.name, end: self.searchTo?.name)
-                        }
-                        // Allow for custom display in search results for fromStop.
-                        // We want to display a [] if a bus stop is the origin and doesn't exist
-                        if !routeSection.isEmpty || self.searchFrom?.type == .busStop {
-                            self.routes.append(routeSection)
-                        }
-
-                }
-
-                self.requestDidFinish(perform: [.hideBanner])
-            case .failure(let networkError):
-                if let error = networkError as? APIError<Error> {
-                    self.processRequestError(error: error, requestURL: requestURL)
+    private func routeSelected(routeId: String) {
+        networking(Endpoint.routeSelected(routeId: routeId)).observe { [weak self] result in
+            guard self != nil else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .value:
+                    print("[RouteOptionsViewController] Route Selected - Success")
+                case .error(let error):
+                    print("[RouteOptionsViewController] Route Selected - Error:", error)
                 }
             }
         }
+    }
+    func processRequest(result: Result<Response<RouteSectionsObject>>, requestURL: String, endPlace: Place) {
+        JSONFileManager.shared.logURL(timestamp: Date(), urlName: "Route requestUrl", url: requestURL)
 
+        switch result {
+        case .value(let response):
+
+            // Save to JSONFileManager
+            if let data = try? JSONEncoder().encode(response) {
+                do { try JSONFileManager.shared.saveJSON(JSON.init(data: data), type: .routeJSON) } catch let error {
+                    let fileName = "RouteOptionsViewController"
+                    let line = "\(fileName) \(#function): \(error.localizedDescription)"
+                    print(line)
+                }
+            }
+            // Parse sections of routes
+            [response.data.fromStop, response.data.boardingSoon, response.data.walking]
+                .forEach { (routeSection) in
+                    routeSection.forEach { (route) in
+                        route.formatDirections(start: self.searchFrom?.name, end: self.searchTo?.name)
+                    }
+                    // Allow for custom display in search results for fromStop.
+                    // We want to display a [] if a bus stop is the origin and doesn't exist
+                    if !routeSection.isEmpty || self.searchFrom?.type == .busStop {
+                        self.routes.append(routeSection)
+                    }
+
+            }
+            self.requestDidFinish(perform: [.hideBanner])
+        case .error(let error):
+            self.processRequestError(error: error, requestURL: requestURL)
+        }
         let payload = DestinationSearchedEventPayload(destination: endPlace.name, requestUrl: requestURL)
         Analytics.shared.log(payload)
     }
 
-    func processRequestError(error: APIError<Error>, requestURL: String) {
-        let title = "Network Failure: \((error.error as NSError?)?.domain ?? "No Domain")"
-        let description = (error.localizedDescription) + ", " + ((error.error as NSError?)?.description ?? "n/a")
+    func processRequestError(error: Error, requestURL: String) {
+        let title = "Network Failure: \((error as NSError?)?.domain ?? "No Domain")"
+        let description = (error.localizedDescription) + ", " + ((error as NSError?)?.description ?? "n/a")
 
         routes = []
         timers = [:]
@@ -974,11 +995,7 @@ extension RouteOptionsViewController: UITableViewDelegate {
             let payload = RouteResultsCellTappedEventPayload()
             Analytics.shared.log(payload)
             let routeId = routes[indexPath.section][indexPath.row].routeId
-            Network.routeSelected(routeId: routeId).perform(withSuccess: { (request) in
-                print("[RouteOptionsViewController] Route Selected - Success:", request["success"])
-            }, failure: { (error) in
-                print("[RouteOptionsViewController] Route Selected - Error:", error)
-            })
+            routeSelected(routeId: routeId)
             navigationController?.pushViewController(routeDetailViewController, animated: true)
         }
     }

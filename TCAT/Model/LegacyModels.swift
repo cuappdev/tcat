@@ -65,14 +65,6 @@ class PlaceResult: NSObject, NSCoding {
         self.name = name
     }
 
-//    required convenience init(json: JSON) throws {
-//        let name = json["structured_formatting"]["main_text"].stringValue
-//        let detail = json["structured_formatting"]["secondary_text"].stringValue
-//        let placeID = json["place_id"].stringValue
-//
-//        self.init(name: name, detail: detail, placeID: placeID)
-//    }
-
     override func isEqual(_ object: Any?) -> Bool {
         if !super.isEqual(object) {
             return false

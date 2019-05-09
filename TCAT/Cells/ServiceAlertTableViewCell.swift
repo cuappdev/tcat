@@ -13,7 +13,7 @@ class ServiceAlertTableViewCell: UITableViewCell {
 
     static let identifier: String = "serviceAlertCell"
     private let fileName: String = "serviceAlertTableViewCell"
-    var alert: Alert?
+    var alert: ServiceAlert?
     var rowNum: Int!
 
     let borderInset = 16

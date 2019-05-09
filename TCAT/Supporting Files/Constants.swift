@@ -78,7 +78,7 @@ struct Constants {
             static let action = "Got It!"
         }
 
-        struct GooglePlacesFailure {
+        struct PlacesFailure {
             static let title = "Couldn't Fetch Place Information"
             static let message = "We ran into an issue fetching the coordinates of the selected location. Please try again later."
             static let action = "OK"
@@ -129,6 +129,8 @@ struct Constants {
         static let done = "Done"
         static let retry = "Retry"
         static let share = "Share"
+        static let add = "Add"
+        static let clear = "Clear"
     }
 
     /// Cell identifiers
@@ -157,6 +159,18 @@ struct Constants {
 
         // Other empty state messages
         static let lookingForRoutes = "Looking For Routes..."
+    }
+
+    /// The routes for each of our endpoints
+    struct Endpoints {
+        static let allStops = "/allStops"
+        static let alerts = "/alerts"
+        static let getRoutes = "/route"
+        static let multiRoute = "/multiroute"
+        static let searchResults = "/search"
+        static let routeSelected = "/routeSelected"
+        static let busLocations = "/tracking"
+        static let delay = "/delay"
     }
 
     struct Footers {

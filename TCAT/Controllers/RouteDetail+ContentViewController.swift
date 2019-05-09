@@ -13,6 +13,7 @@ import MapKit
 import SwiftyJSON
 import NotificationBannerSwift
 import Pulley
+import FutureNova
 
 class RouteDetailContentViewController: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate {
 
@@ -39,6 +40,8 @@ class RouteDetailContentViewController: UIViewController, GMSMapViewDelegate, CL
             setNeedsStatusBarAppearanceUpdate()
         }
     }
+
+    private let networking: Networking = URLSession.shared.request
 
     var route: Route!
     var directions: [Direction] = []
@@ -284,6 +287,11 @@ class RouteDetailContentViewController: UIViewController, GMSMapViewDelegate, CL
         Handles connection issues with banners.
         Animated indicators
      */
+
+    private func busLocations(_ directions: [Direction]) -> Future<Response<[BusLocation]>> {
+        return networking(Endpoint.getBusLocations(directions)).decode()
+    }
+
     @objc func getBusLocations() {
 
         let directionsAreValid = route.directions.reduce(true) { (result, direction) in
@@ -299,69 +307,73 @@ class RouteDetailContentViewController: UIViewController, GMSMapViewDelegate, CL
             return
         }
 
-        Network.getBusLocations(route.directions).perform(withSuccess: { (result) in
+        busLocations(route.directions).observe { [weak self] result in
+            guard let `self` = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .value(let response):
+                    var results = [BusDataType]()
 
-            var results = [BusDataType]()
+                    if response.data.isEmpty {
+                        // print("No Bus Locations")
+                        // Reset banner in case transitioned from Error to Online - No Bus Locations
+                        self.hideBanner()
 
-            if result.data.isEmpty {
-                // print("No Bus Locations")
-                // Reset banner in case transitioned from Error to Online - No Bus Locations
-                self.hideBanner()
+                        // Possibly add information about no tracking available.
+                    }
 
-                // Possibly add information about no tracking available.
+                    for busLocation in response.data {
+
+                        results.append(busLocation.dataType)
+
+                        switch busLocation.dataType {
+
+                        case .noData:
+                            // print("No Data for", busLocation.routeNumber)
+
+                            if !self.noDataRouteList.contains(busLocation.routeNumber) {
+                                self.noDataRouteList.append(busLocation.routeNumber)
+                            }
+
+                        case .invalidData:
+                            // print("Invalid Data for", busLocation.routeNumber)
+
+                            if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
+                                self.noDataRouteList.remove(at: previouslyUnavailableRoute)
+                            }
+
+                            if self.noDataRouteList.isEmpty {
+                                self.hideBanner()
+                            }
+
+                            self.showBanner(Constants.Banner.trackingLater, status: .info)
+
+                        case .validData:
+                            // print("Valid Data for", busLocation.routeNumber)
+
+                            if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
+                                self.noDataRouteList.remove(at: previouslyUnavailableRoute)
+                            }
+
+                            if self.noDataRouteList.isEmpty {
+                                self.hideBanner()
+                            }
+
+                            self.setBusLocation(busLocation)
+
+                        } // switch end
+
+                } // busLocations for loop end
+                case .error(let error):
+                    print("RouteDetailVC getBusLocations Error:", error.localizedDescription)
+                    if let banner = self.banner, !banner.isDisplaying {
+                        self.showBanner(Constants.Banner.cannotConnectLive, status: .danger)
+                    }
+
+                }
             }
 
-            for busLocation in result.data {
-
-                results.append(busLocation.dataType)
-
-                switch busLocation.dataType {
-
-                case .noData:
-                    // print("No Data for", busLocation.routeNumber)
-
-                    if !self.noDataRouteList.contains(busLocation.routeNumber) {
-                        self.noDataRouteList.append(busLocation.routeNumber)
-                    }
-
-                case .invalidData:
-                    // print("Invalid Data for", busLocation.routeNumber)
-
-                    if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
-                        self.noDataRouteList.remove(at: previouslyUnavailableRoute)
-                    }
-
-                    if self.noDataRouteList.isEmpty {
-                        self.hideBanner()
-                    }
-
-                    self.showBanner(Constants.Banner.trackingLater, status: .info)
-
-                case .validData:
-                    // print("Valid Data for", busLocation.routeNumber)
-
-                    if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
-                        self.noDataRouteList.remove(at: previouslyUnavailableRoute)
-                    }
-
-                    if self.noDataRouteList.isEmpty {
-                        self.hideBanner()
-                    }
-
-                    self.setBusLocation(busLocation)
-
-                } // switch end
-
-            } // busLocations for loop end
-
-        }, failure: { error in
-
-            print("RouteDetailVC getBusLocations Error:", error.localizedDescription)
-            if let banner = self.banner, !banner.isDisplaying {
-                self.showBanner(Constants.Banner.cannotConnectLive, status: .danger)
-            }
-
-        }) // network completion handler end
+        }
 
         // Bounce any visible indicators
         bounceIndicators()

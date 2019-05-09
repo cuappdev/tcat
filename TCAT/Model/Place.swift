@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 enum PlaceType: String, Codable {
     case busStop, googlePlace, unknown
@@ -39,9 +40,8 @@ enum PlaceType: String, Codable {
         self.name = name
         self.type = .unknown
     }
-
-    /// Initializer for Google Places.
-    convenience init(name: String, placeDescription: String, placeIdentifier: String) {
+    /// Initializer for Google Places
+    convenience init(name: String, placeDescription: String = "", placeIdentifier: String = "") {
         self.init(name: name)
         self.placeDescription = placeDescription
         self.placeIdentifier = placeIdentifier
@@ -72,4 +72,51 @@ enum PlaceType: String, Codable {
         return object.name == name
     }
 
+    class func filterAllStops(allStops: [Place]) -> [Place] {
+
+        // Create dictionary of all pulled stops
+        let crossReference = allStops.reduce(into: [String: [Place]]()) {
+            $0[$1.name, default: []].append($1)
+        }
+
+        // Create an array of all stops that are non duplicates by name
+        var nonDuplicateStops = crossReference.filter {$1.count == 1}.map { (_, value) -> Place in
+            return value.first!
+        }
+
+        // Create an array of all stops that are duplicates by name
+        let duplicates = crossReference.filter { $1.count > 1 }
+
+        // Begin filtering stops with same names
+        duplicates.keys.forEach { key in
+            if
+                let currentBusStops = duplicates[key],
+                let first = currentBusStops.first,
+                let second = currentBusStops.last
+            {
+                guard
+                    let firstLat = first.latitude, let firstLong = first.longitude,
+                    let secondLat = second.latitude, let secondLong = second.longitude
+                    else { return }
+                let firstStopLocation = CLLocation(latitude: firstLat, longitude: firstLong)
+                let secondStopLocation = CLLocation(latitude: secondLat, longitude: secondLong)
+
+                let distanceBetween = firstStopLocation.distance(from: secondStopLocation)
+
+                if distanceBetween < Constants.Values.maxDistanceBetweenStops {
+                    // If stops are too close to each other, combine into a new stop with averaged location and add to list
+                    let middleCoordinate = firstStopLocation.coordinate.middleLocationWith(location: secondStopLocation.coordinate)
+                    let middleBusStop = Place(name: first.name, latitude: middleCoordinate.latitude, longitude: middleCoordinate.longitude)
+                    nonDuplicateStops.append(middleBusStop)
+                } else {
+                    // If not, add directly to the final list to be returned as data
+                    nonDuplicateStops.append(contentsOf: [first, second])
+                }
+            }
+        }
+
+        // Sort in alphabetical order
+        let sortedStops = nonDuplicateStops.sorted(by: {$0.name.uppercased() < $1.name.uppercased()})
+        return sortedStops
+    }
 }

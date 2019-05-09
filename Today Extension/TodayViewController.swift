@@ -10,8 +10,7 @@ import UIKit
 import NotificationCenter
 import SnapKit
 import CoreLocation
-import TRON
-import Alamofire
+import FutureNova
 
 @objc(TodayViewController) class TodayViewController: UIViewController, NCWidgetProviding {
 
@@ -28,9 +27,13 @@ import Alamofire
     var invalidLocation: Bool = false
 
     let cellHeight: CGFloat = 110.0
+    
+    private let networking: Networking = URLSession.shared.request
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        Endpoint.setupEndpointConfig()
 
         if #available(iOSApplicationExtension 10.0, *) {
             extensionContext?.widgetLargestAvailableDisplayMode = .compact
@@ -56,37 +59,39 @@ import Alamofire
                 invalidLocation = true
                 routesTable.reloadData()
             } else {
-                Network.getMultiRoutes(startCoord: start, time: Date(), endCoords: coordinates, endPlaceNames: favorites) { (request) in
-                    self.processRequest(request: request)
+                getMultiRoutes(startCoord: start, time: Date(), endCoords: coordinates, endPlaceNames: favorites).observe { [weak self] result in
+                    guard let `self` = self else { return }
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .value(let response):
+                            self.routes = response.data
+                            self.rearrangeRoutes()
+                            self.didFetchRoutes = true
+                            if #available(iOSApplicationExtension 10.0, *) {
+                                self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
+                            } else {
+                                // Fallback on earlier versions
+                            }
+                            self.routesTable.reloadData()
+                        case .error(let error):
+                            self.processRequestError(error: error)
+                        }
+                    }
                 }
             }
         }
     }
-
-    func processRequest(request: APIRequest<MultiRoutesRequest, Error>) {
-        request.performCollectingTimeline { (response) in
-            switch response.result {
-            case .success(let routesResponse):
-                self.routes = routesResponse.data
-                self.rearrangeRoutes()
-                self.didFetchRoutes = true
-                if #available(iOSApplicationExtension 10.0, *) {
-                    self.extensionContext?.widgetLargestAvailableDisplayMode = .expanded
-                } else {
-                    // Fallback on earlier versions
-                }
-                self.routesTable.reloadData()
-            case .failure(let networkError):
-                if let error = networkError as? APIError<Error> {
-                    self.processRequestError(error: error)
-                }
-            }
-        }
+    
+    private func getMultiRoutes(startCoord: CLLocationCoordinate2D,
+                                time: Date,
+                                endCoords: [String],
+                                endPlaceNames: [String]) -> Future<Response<[Route?]>> {
+        return networking(Endpoint.getMultiRoutes(startCoord: startCoord, time: time, endCoords: endCoords, endPlaceNames: endPlaceNames)).decode()
     }
 
-    func processRequestError(error: APIError<Error>) {
-        let title = "Network Failure: \((error.error as NSError?)?.domain ?? "No Domain")"
-        let description = (error.localizedDescription) + ", " + ((error.error as NSError?)?.description ?? "n/a")
+    func processRequestError(error: Error) {
+        let title = "Network Failure: \((error as NSError?)?.domain ?? "No Domain")"
+        let description = (error.localizedDescription) + ", " + ((error as NSError?)?.description ?? "n/a")
 
         routes = []
         print("Error Title: \(title)")

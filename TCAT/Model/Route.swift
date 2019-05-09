@@ -221,21 +221,6 @@ class Route: NSObject, Codable {
         return rawDirections.first { $0.type == .depart }
     }
 
-    func getLastDepartRawDirection() -> Direction? {
-        return rawDirections.reversed().first { $0.type == .depart }
-    }
-
-    func getRawNumOfWalkLines() -> Int {
-        var count = 0
-        for (index, direction) in rawDirections.enumerated() {
-            if index != rawDirections.count - 1 && direction.type == .walk {
-                count += 1
-            }
-        }
-
-        return count
-    }
-
     /** Calculate travel distance from location passed in to first route summary object and updates travel distance of route
      */
     func calculateTravelDistance(fromRawDirections rawDirections: [Direction]) {
@@ -258,22 +243,6 @@ class Route: NSObject, Codable {
         }
 
         travelDistance = fromLocation.distance(from: endLocation)
-
-    }
-
-    override var debugDescription: String {
-
-        let mainDescription = """
-            departtureTime: \(self.departureTime)\n
-            arrivalTime: \(self.arrivalTime)\n
-            startCoords: \(self.startCoords)\n
-            endCoords: \(self.endCoords)\n
-            startName: \(self.startName)\n
-            endName: \(self.endName)\n
-            timeUntilDeparture: \(self.timeUntilDeparture)\n
-        """
-
-        return mainDescription
 
     }
 
