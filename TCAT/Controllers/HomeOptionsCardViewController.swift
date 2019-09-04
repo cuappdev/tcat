@@ -15,6 +15,8 @@ import UIKit
 protocol HomeOptionsCardDelegate: class {
     func updateSize()
     func getCurrentLocation() -> CLLocation?
+    func presentFavoritesTVC()
+    func openInformationScreen()
 }
 
 class HomeOptionsCardViewController: UIViewController {
@@ -266,16 +268,12 @@ class HomeOptionsCardViewController: UIViewController {
     }
 
     @objc func presentFavoritesTVC(sender: UIButton? = nil) {
-        let favoritesTVC = FavoritesTableViewController()
-        let navController = CustomNavigationController(rootViewController: favoritesTVC)
-        present(navController, animated: true, completion: nil)
+        delegate?.presentFavoritesTVC()
     }
 
     /* Open information screen */
     @objc private func openInformationScreen() {
-        let informationViewController = InformationViewController()
-        let navigationVC = CustomNavigationController(rootViewController: informationViewController)
-        present(navigationVC, animated: true)
+        delegate?.openInformationScreen()
     }
 
     /* Get Search Results */

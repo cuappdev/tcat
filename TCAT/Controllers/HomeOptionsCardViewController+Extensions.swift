@@ -6,6 +6,7 @@
 //  Copyright © 2019 cuappdev. All rights reserved.
 //
 
+import Reachability
 import UIKit
 
 // MARK: VC Life Cycle setup

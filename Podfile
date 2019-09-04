@@ -15,6 +15,7 @@ target 'TCAT' do
     # Networking + Data
     pod 'SwiftyJSON', '~> 5.0'
     pod 'FutureNova', :git => 'https://github.com/cuappdev/ios-networking.git'
+    pod 'ReachabilitySwift'
     
     # Analytics
     pod 'Crashlytics', '~> 3.12'
