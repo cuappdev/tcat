@@ -82,6 +82,7 @@ class RouteDiagramSegment: UIView {
 
         stopLabel.snp.makeConstraints { make in
             make.leading.equalTo(stopDot.snp.centerX).offset(spaceBtnStopDotCenterXAndStopLabel)
+            make.trailing.equalToSuperview().inset(16)
             make.top.equalTo(stopDot)
         }
     }
@@ -93,7 +94,7 @@ class RouteDiagramSegment: UIView {
         let rightSpaceFromSuperview: CGFloat = 16
         let width: CGFloat = UIScreen.main.bounds.width - yPos - rightSpaceFromSuperview
 
-        let stopLabel = UILabel(frame: CGRect(x: 0, y: 0, width: width, height: 17))
+        let stopLabel = UILabel()
         // allow for multi-line label for long stop names
         stopLabel.allowsDefaultTighteningForTruncation = true
         stopLabel.lineBreakMode = .byWordWrapping
@@ -143,6 +144,7 @@ class RouteDiagramSegment: UIView {
         testStopLabel.font = .getFont(.regular, size: 14.0)
         testStopLabel.textColor = Colors.primaryText
         testStopLabel.text = name
+        testStopLabel.sizeToFit()
 
         return testStopLabel
     }

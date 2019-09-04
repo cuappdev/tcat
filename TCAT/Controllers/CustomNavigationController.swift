@@ -6,7 +6,14 @@
 //  Copyright © 2017 cuappdev. All rights reserved.
 //
 
+import FutureNova
+import NotificationBannerSwift
+import Reachability
 import UIKit
+
+protocol ReachabilityDelegate: class {
+    func reachabilityChanged(connection: Reachability.Connection)
+}
 
 class CustomNavigationController: UINavigationController, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
 
@@ -24,6 +31,9 @@ class CustomNavigationController: UINavigationController, UINavigationController
     ]
 
     private var screenshotObserver: NSObjectProtocol?
+    private weak var reachabilityDelegate: ReachabilityDelegate?
+    private var reachability: Reachability!
+    private let banner = StatusBarNotificationBanner(title: Constants.Banner.noInternetConnection, style: .danger)
 
     override init(rootViewController: UIViewController) {
         super.init(rootViewController: rootViewController)
@@ -33,6 +43,24 @@ class CustomNavigationController: UINavigationController, UINavigationController
 
     open override var childForStatusBarStyle: UIViewController? {
         return visibleViewController
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        reachability = Reachability()!
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(reachabilityChanged(notif:)),
+                                               name: .reachabilityChanged,
+                                               object: reachability)
+        do {
+            try reachability.startNotifier()
+        } catch {
+            print("could not start reachability notifier")
+        }
+    }
+
+    override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
+        banner.dismiss()
+        super.present(viewControllerToPresent, animated: flag, completion: completion)
     }
 
     override func viewDidLoad() {
@@ -58,6 +86,7 @@ class CustomNavigationController: UINavigationController, UINavigationController
         if let screenshotObserver = screenshotObserver {
             NotificationCenter.default.removeObserver(screenshotObserver)
         }
+        reachability.stopNotifier()
     }
 
     private func customizeAppearance() {
@@ -100,6 +129,23 @@ class CustomNavigationController: UINavigationController, UINavigationController
         _ = popViewController(animated: true)
     }
 
+    @objc func reachabilityChanged(notif: Notification) {
+        if let reachability = notif.object as? Reachability {
+            switch reachability.connection {
+            case .wifi, .cellular:
+                banner.dismiss()
+                UIApplication.shared.statusBarStyle = .default
+            case .none:
+                banner.show(queuePosition: .front, on: self)
+                banner.autoDismiss = false
+                banner.isUserInteractionEnabled = false
+                UIApplication.shared.statusBarStyle = .lightContent
+            }
+            setNeedsStatusBarAppearanceUpdate()
+            reachabilityDelegate?.reachabilityChanged(connection: reachability.connection)
+        }
+    }
+
     // MARK: UINavigationController Functions
 
     override func pushViewController(_ viewController: UIViewController, animated: Bool) {
@@ -119,13 +165,23 @@ class CustomNavigationController: UINavigationController, UINavigationController
                 viewController.navigationItem.setLeftBarButton(customBackButton(), animated: true)
             }
         }
+
+        if let delegate = viewController as? ReachabilityDelegate {
+            reachabilityDelegate = delegate
+        }
     }
 
     override func popViewController(animated: Bool) -> UIViewController? {
-
         let viewController = super.popViewController(animated: animated)
-        if let lastViewController = viewControllers.last as? HomeMapViewController {
-            lastViewController.navigationItem.leftBarButtonItem = nil
+        if let lastViewController = viewControllers.last {
+            if let delegate = viewController as? ReachabilityDelegate {
+                reachabilityDelegate = delegate
+            } else {
+                reachabilityDelegate = nil
+            }
+            if let homeMapVC = lastViewController as? HomeMapViewController {
+                homeMapVC.navigationItem.leftBarButtonItem = nil
+            }
         }
         return viewController
     }

@@ -259,7 +259,8 @@ extension AllStopsTableViewController: UITableViewDelegate {
             print("Could not find bus stop")
             return
         }
-        optionsVC.didSelectPlace(place: place)
+        optionsVC.searchTo = place
+//        optionsVC.didSelectPlace(place: place)
 
         definesPresentationContext = false
         tableView.deselectRow(at: indexPath, animated: true)
