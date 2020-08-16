@@ -21,6 +21,9 @@ target 'TCAT' do
     pod 'Crashlytics', '~> 3.12'
     pod 'Fabric', '~> 1.9'
     pod 'Firebase/Core'
+    pod 'Firebase/Firestore'
+    pod 'FirebaseFirestoreSwift'
+    pod 'Firebase/Storage'
     
     # File Management
     pod 'Zip', '~> 1.1'

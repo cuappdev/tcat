@@ -44,7 +44,7 @@ enum BusIconType: String {
             return 4
         }
     }
-    
+
     var baseColor: UIColor {
         switch self {
         case .blueBannerSmall, .redBannerSmall:
@@ -53,7 +53,7 @@ enum BusIconType: String {
             return Colors.tcatBlue
         }
     }
-    
+
     var contentColor: UIColor {
         switch self {
         case .blueBannerSmall:

@@ -236,7 +236,7 @@ struct Constants {
         static let maxZoom: Float = 25
         static let searchRadius = 24140
     }
-    
+
     struct Notification {
         static let arrivalNotification = "is arriving"
         static let beforeBoardingConfirmation = "You will receive notifications 10 min before boarding time"

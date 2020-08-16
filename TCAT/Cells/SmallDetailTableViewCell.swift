@@ -36,7 +36,7 @@ class SmallDetailTableViewCell: UITableViewCell {
 
         hairline.backgroundColor = Colors.tableViewSeparator
         contentView.addSubview(hairline)
-        
+
         // Hide hairline for last SmallDetailTVC so it's not next to NotificationToggleTVC hairline
         if isLastStep {
             hairline.isHidden = true

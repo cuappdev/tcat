@@ -146,7 +146,7 @@ extension RouteDetailDrawerViewController: PulleyDrawerViewControllerDelegate {
 }
 
 extension RouteDetailDrawerViewController: UITableViewDataSource {
-    
+
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
@@ -212,7 +212,7 @@ extension RouteDetailDrawerViewController: UITableViewDelegate {
             } else {
                 return RouteDetailCellSize.smallHeight
             }
-        case .notification: return notificationCellHeight 
+        case .notification: return notificationCellHeight
         }
     }
 

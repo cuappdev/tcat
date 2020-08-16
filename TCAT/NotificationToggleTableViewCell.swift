@@ -13,9 +13,9 @@ protocol NotificationToggleTableViewDelegate: class {
 }
 
 class NotificationToggleTableViewCell: UITableViewCell {
-    
+
     private weak var delegate: NotificationToggleTableViewDelegate?
-    
+
     private var type: NotificationType!
 
     private let firstHairline = UIView()
@@ -66,7 +66,7 @@ class NotificationToggleTableViewCell: UITableViewCell {
             make.trailing.equalTo(notificationSwitch.snp.leading).offset(notificationTitleTrailingInset)
         }
     }
-    
+
     func setupFirstHairline() {
         firstHairline.backgroundColor = Colors.tableViewSeparator
         contentView.addSubview(firstHairline)
@@ -85,7 +85,7 @@ class NotificationToggleTableViewCell: UITableViewCell {
             setupFirstHairline()
         }
     }
-    
+
     @objc func switchValueChanged() {
         if notificationSwitch.isOn {
             switch type {

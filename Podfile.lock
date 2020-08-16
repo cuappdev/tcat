@@ -1,4 +1,10 @@
 PODS:
+  - BoringSSL-GRPC (0.0.3):
+    - BoringSSL-GRPC/Implementation (= 0.0.3)
+    - BoringSSL-GRPC/Interface (= 0.0.3)
+  - BoringSSL-GRPC/Implementation (0.0.3):
+    - BoringSSL-GRPC/Interface (= 0.0.3)
+  - BoringSSL-GRPC/Interface (0.0.3)
   - Crashlytics (3.14.0):
     - Fabric (~> 1.10.2)
   - DZNEmptyDataSet (1.8.1)
@@ -8,6 +14,12 @@ PODS:
     - FirebaseAnalytics (= 6.1.5)
   - Firebase/CoreOnly (6.12.0):
     - FirebaseCore (= 6.3.3)
+  - Firebase/Firestore (6.12.0):
+    - Firebase/CoreOnly
+    - FirebaseFirestore (~> 1.7.0)
+  - Firebase/Storage (6.12.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 3.4.1)
   - FirebaseAnalytics (6.1.5):
     - FirebaseCore (~> 6.3)
     - FirebaseInstanceID (~> 4.2)
@@ -17,6 +29,7 @@ PODS:
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (= 0.3.9011)
+  - FirebaseAuthInterop (1.1.0)
   - FirebaseCore (6.3.3):
     - FirebaseCoreDiagnostics (~> 1.0)
     - FirebaseCoreDiagnosticsInterop (~> 1.0)
@@ -29,10 +42,31 @@ PODS:
     - GoogleUtilities/Logger (~> 6.2)
     - nanopb (~> 0.3.901)
   - FirebaseCoreDiagnosticsInterop (1.1.0)
+  - FirebaseFirestore (1.7.0):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 6.2)
+    - FirebaseFirestore/abseil-cpp (= 1.7.0)
+    - "gRPC-C++ (= 0.0.9)"
+    - leveldb-library (~> 1.22)
+    - nanopb (~> 0.3.901)
+    - Protobuf (>= 3.9.2, ~> 3.9)
+  - FirebaseFirestore/abseil-cpp (1.7.0):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 6.2)
+    - "gRPC-C++ (= 0.0.9)"
+    - leveldb-library (~> 1.22)
+    - nanopb (~> 0.3.901)
+    - Protobuf (>= 3.9.2, ~> 3.9)
+  - FirebaseFirestoreSwift (0.2):
+    - FirebaseFirestore (>= 1.6.1, ~> 1.6)
   - FirebaseInstanceID (4.2.7):
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
     - GoogleUtilities/UserDefaults (~> 6.0)
+  - FirebaseStorage (3.4.3):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 6.0)
+    - GTMSessionFetcher/Core (~> 1.1)
   - FutureNova (0.1.6)
   - GoogleAppMeasurement (6.1.5):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
@@ -67,6 +101,24 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (6.3.1):
     - GoogleUtilities/Logger
+  - "gRPC-C++ (0.0.9)":
+    - "gRPC-C++/Implementation (= 0.0.9)"
+    - "gRPC-C++/Interface (= 0.0.9)"
+  - "gRPC-C++/Implementation (0.0.9)":
+    - "gRPC-C++/Interface (= 0.0.9)"
+    - gRPC-Core (= 1.21.0)
+    - nanopb (~> 0.3)
+  - "gRPC-C++/Interface (0.0.9)"
+  - gRPC-Core (1.21.0):
+    - gRPC-Core/Implementation (= 1.21.0)
+    - gRPC-Core/Interface (= 1.21.0)
+  - gRPC-Core/Implementation (1.21.0):
+    - BoringSSL-GRPC (= 0.0.3)
+    - gRPC-Core/Interface (= 1.21.0)
+    - nanopb (~> 0.3)
+  - gRPC-Core/Interface (1.21.0)
+  - GTMSessionFetcher/Core (1.4.0)
+  - leveldb-library (1.22)
   - MarqueeLabel (4.0.0)
   - nanopb (0.3.9011):
     - nanopb/decode (= 0.3.9011)
@@ -77,6 +129,7 @@ PODS:
     - MarqueeLabel (~> 4.0.0)
     - SnapKit (~> 5.0.0)
   - Presentation (4.2.3)
+  - Protobuf (3.11.4)
   - Pulley (2.7.0)
   - SnapKit (5.0.1)
   - SwiftLint (0.36.0)
@@ -90,6 +143,9 @@ DEPENDENCIES:
   - DZNEmptyDataSet (from `https://github.com/cuappdev/DZNEmptyDataSet.git`)
   - Fabric (~> 1.9)
   - Firebase/Core
+  - Firebase/Firestore
+  - Firebase/Storage
+  - FirebaseFirestoreSwift
   - FutureNova (from `https://github.com/cuappdev/ios-networking.git`)
   - GoogleMaps (~> 3.1)
   - NotificationBannerSwift (~> 3.0.0)
@@ -104,22 +160,32 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - BoringSSL-GRPC
     - Crashlytics
     - Fabric
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseCoreDiagnosticsInterop
+    - FirebaseFirestore
+    - FirebaseFirestoreSwift
     - FirebaseInstanceID
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
     - GoogleMaps
     - GoogleUtilities
+    - "gRPC-C++"
+    - gRPC-Core
+    - GTMSessionFetcher
+    - leveldb-library
     - MarqueeLabel
     - nanopb
     - NotificationBannerSwift
+    - Protobuf
     - Pulley
     - SnapKit
     - SwiftLint
@@ -148,25 +214,35 @@ CHECKOUT OPTIONS:
     :git: https://github.com/cuappdev/Presentation.git
 
 SPEC CHECKSUMS:
+  BoringSSL-GRPC: db8764df3204ccea016e1c8dd15d9a9ad63ff318
   Crashlytics: 540b7e5f5da5a042647227a5e3ac51d85eed06df
   DZNEmptyDataSet: b94434220f87d9dda46660eb4f07a424778e93b4
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Firebase: da031bc7012374e3bed17a6731b89327b29863b9
   FirebaseAnalytics: 4e53a7eb7b76bc703c4d9239bc964545e9b23361
+  FirebaseAuthInterop: a0f37ae05833af156e72028f648d313f7e7592e9
   FirebaseCore: bcd6c112429249d7921e907d661e8955a3549e26
   FirebaseCoreDiagnostics: af29e43048607588c050889d19204f4d7b758c9f
   FirebaseCoreDiagnosticsInterop: e9b1b023157e3a2fc6418b5cb601e79b9af7b3a0
+  FirebaseFirestore: 1c7ed32c09d6b0148034e035d0c07783ca45bac3
+  FirebaseFirestoreSwift: 0437bb10d83f8161a9131da1739998254c78fdf5
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
+  FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
   FutureNova: 95f9aa352b2c250253b96fdf380754afcc87c7f3
   GoogleAppMeasurement: 037f46d1d8ae8b312720f1042585ab961a1289e3
   GoogleDataTransport: 166f9b9f82cbf60a204e8fe2daa9db3e3ec1fb15
   GoogleDataTransportCCTSupport: f6ab1962e9dc05ab1fb938b795e5b310209edeec
   GoogleMaps: 82f8fe307193bb4de6ef6bf9e88f1d624b718f9d
   GoogleUtilities: f895fde57977df4e0233edda0dbeac490e3703b6
+  "gRPC-C++": 9dfe7b44821e7b3e44aacad2af29d2c21f7cde83
+  gRPC-Core: c9aef9a261a1247e881b18059b84d597293c9947
+  GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
+  leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   MarqueeLabel: b55b26e690b6ad41faedd95cbf5eae6f1d1735b4
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   NotificationBannerSwift: 713e20f21b6105f4a36a00e5d9fa414a930d3d8e
   Presentation: 3c02ab6268b15e44b6146c511686eb9c3f81b7d0
+  Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   Pulley: 028ddcc7d2dcbc078d71b61b7eee8e786d72c14a
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   SwiftLint: fc9859e4e1752340664851f667bb1898b9c90114
@@ -175,6 +251,6 @@ SPEC CHECKSUMS:
   Wormholy: db6ac46a6d20db2d11ddcf975a5a9bcc1abc889e
   Zip: 8877eede3dda76bcac281225c20e71c25270774c
 
-PODFILE CHECKSUM: 74f5baec712c32e17985650cbe8dc20c43556af2
+PODFILE CHECKSUM: e229b7959cd687a9f4786780a876fb8d69e474f3
 
 COCOAPODS: 1.8.4
