@@ -78,12 +78,26 @@ internal struct Trip: Codable {
     let tripID: String
 }
 
+internal struct TripV3: Codable {
+    let stopId: String
+    let tripId: String
+}
+
 internal struct TripBody: Codable {
     var data: [Trip]
 }
 
+internal struct TripBodyV3: Codable {
+    var data: [TripV3]
+}
+
 internal struct Delay: Codable {
     let tripID: String
+    let delay: Int?
+}
+
+internal struct DelayV3: Codable {
+    let tripId: String
     let delay: Int?
 }
 

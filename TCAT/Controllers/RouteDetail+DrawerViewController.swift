@@ -202,8 +202,8 @@ class RouteDetailDrawerViewController: UIViewController {
                     case .value(let response):
                         if response.success {
 
-                            delayDirection.delay = response.data
-                            firstDepartDirection.delay = response.data
+                            delayDirection.delay = response.data.first?.delay
+                            firstDepartDirection.delay = response.data.first?.delay
 
                             // Update delay variable of other ensuing directions
                             directions.filter {
@@ -240,7 +240,7 @@ class RouteDetailDrawerViewController: UIViewController {
         }
     }
 
-    private func getDelay(tripId: String, stopId: String) -> Future<Response<Int?>> {
+    private func getDelay(tripId: String, stopId: String) -> Future<Response<[DelayV3]>> {
         return networking(Endpoint.getDelay(tripID: tripId, stopID: stopId)).decode()
     }
 

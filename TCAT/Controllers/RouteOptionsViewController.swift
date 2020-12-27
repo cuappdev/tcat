@@ -50,7 +50,7 @@ class RouteOptionsViewController: UIViewController {
     var searchTo: Place!
     var searchType: SearchBarType = .to
     var showRouteSearchingLoader: Bool = false
-    var trips: [Trip] = []
+    var trips: [TripV3] = []
 
     /// Variable to remember back button when hiding
     private var backButton: UIBarButtonItem?
@@ -349,7 +349,7 @@ class RouteOptionsViewController: UIViewController {
         routeResults.reloadData()
     }
 
-    private func getAllDelays(trips: [Trip]) -> Future<Response<[Delay]>> {
+    private func getAllDelays(trips: [TripV3]) -> Future<Response<[DelayV3]>> {
         return networking(Endpoint.getAllDelays(trips: trips)).decode()
     }
 
@@ -361,7 +361,7 @@ class RouteOptionsViewController: UIViewController {
                     if !delaysResponse.success { return }
                     let allDelays = delaysResponse.data
                     for delayResponse in allDelays {
-                        let tripRoute = self.tripDictionary[delayResponse.tripID]
+                        let tripRoute = self.tripDictionary[delayResponse.tripId]
                         guard let route = tripRoute,
                             let routeId = tripRoute?.routeId,
                             let direction = route.getFirstDepartRawDirection(),
@@ -535,7 +535,7 @@ class RouteOptionsViewController: UIViewController {
                         continue
                 }
                 tripDictionary[tripId] = route
-                let trip = Trip(stopID: stopId, tripID: tripId)
+                let trip = TripV3(stopId: stopId, tripId: tripId)
                 trips.append(trip)
             }
         }
