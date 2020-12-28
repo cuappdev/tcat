@@ -1,5 +1,5 @@
 //
-//  BusLocationV3.swift
+//  BusLocation.swift
 //  TCAT
 //
 //  Created by Yana Sang on 12/27/20.
@@ -9,7 +9,7 @@
 import MapKit
 import UIKit
 
-enum BusDataTypeV3: String, Codable {
+enum BusDataType: String, Codable {
     /// Invalid data (e.g. bus trip too far in future)
     case invalidData
     /// No data to show
@@ -18,11 +18,12 @@ enum BusDataTypeV3: String, Codable {
     case validData
 }
 
-class BusLocationV3: NSObject, Codable {
+class BusLocation: NSObject, Codable {
 
-    var dataType: BusDataTypeV3
+    var dataType: BusDataType
     var latitude: Double
     var longitude: Double
+    /// The number representing the bus route.
     var routeId: Int
     var vehicleId: String
 
@@ -38,7 +39,7 @@ class BusLocationV3: NSObject, Codable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        dataType = try container.decode(BusDataTypeV3.self, forKey: .dataType)
+        dataType = try container.decode(BusDataType.self, forKey: .dataType)
         latitude = try container.decode(Double.self, forKey: .latitude)
         longitude = try container.decode(Double.self, forKey: .longitude)
         routeId = try Int(container.decode(String.self, forKey: .routeId)) ?? 0
@@ -46,7 +47,7 @@ class BusLocationV3: NSObject, Codable {
     }
 
     init(
-        dataType: BusDataTypeV3,
+        dataType: BusDataType,
         latitude: Double,
         longitude: Double,
         routeId: Int,
@@ -72,10 +73,5 @@ class BusLocationV3: NSObject, Codable {
             return _iconView!
         }
     }
-
-//    /// The Int type of routeId. Defaults to 0 if can't cast to Int
-//    var routeNumber: Int {
-//        return Int(routeId) ?? 0
-//    }
 
 }

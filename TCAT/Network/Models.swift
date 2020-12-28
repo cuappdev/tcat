@@ -51,16 +51,6 @@ internal struct GetBusLocationsBody: Codable {
 }
 
 internal struct BusLocationsInfo: Codable {
-    let stopID: String
-    let routeID: String
-    let tripIdentifiers: [String]
-}
-
-internal struct GetBusLocationsBodyV3: Codable {
-    var data: [BusLocationsInfoV3]
-}
-
-internal struct BusLocationsInfoV3: Codable {
     let routeId: String
     let tripId: String
 }
@@ -69,17 +59,6 @@ class RouteSectionsObject: Codable {
     var fromStop: [Route]
     var boardingSoon: [Route]
     var walking: [Route]
-}
-
-internal struct GetDelayBody: Codable {
-
-    let stopID: String
-    let tripID: String
-
-    func toQueryItems() -> [URLQueryItem] {
-        return [URLQueryItem(name: "stopID", value: stopID), URLQueryItem(name: "tripID", value: tripID)]
-    }
-
 }
 
 internal struct Trip: Codable {

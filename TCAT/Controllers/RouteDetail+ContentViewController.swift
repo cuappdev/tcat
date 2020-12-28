@@ -161,7 +161,7 @@ class RouteDetailContentViewController: UIViewController {
 
     // MARK: - Network Calls
 
-    private func busLocations(_ directions: [Direction]) -> Future<Response<[BusLocationV3]>> {
+    private func busLocations(_ directions: [Direction]) -> Future<Response<[BusLocation]>> {
         return networking(Endpoint.getBusLocations(directions)).decode()
     }
 
@@ -212,7 +212,7 @@ class RouteDetailContentViewController: UIViewController {
         bounceIndicators()
     }
 
-    private func parseBusLocationsData(data: [BusLocationV3]) {
+    private func parseBusLocationsData(data: [BusLocation]) {
         data.forEach { busLocation in
             switch busLocation.dataType {
             case .noData:
@@ -244,7 +244,7 @@ class RouteDetailContentViewController: UIViewController {
     /// If `validTripIDs` is passed in, only buses that match the tripID will be drawn.
     /// The input includes every bus associated with a certain line. Any visible indicators
     /// are also animated.
-    private func setBusLocation(_ bus: BusLocationV3) {
+    private func setBusLocation(_ bus: BusLocation) {
         // New bus coordinates
         let busCoords = CLLocationCoordinate2D(latitude: bus.latitude, longitude: bus.longitude)
         let existingBus = buses.first(where: {

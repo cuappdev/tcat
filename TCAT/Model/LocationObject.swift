@@ -1,5 +1,5 @@
 //
-//  BusLocation.swift
+//  LocationObject.swift
 //  TCAT
 //
 //  Created by Matthew Barker on 9/6/17.

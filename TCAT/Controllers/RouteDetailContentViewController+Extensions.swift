@@ -85,9 +85,23 @@ extension RouteDetailContentViewController {
 // MARK: - Location Manager Functions
 extension RouteDetailContentViewController: CLLocationManagerDelegate {
 
+    private func isValidCoordinate(latitude: Double, longitude: Double) -> Bool {
+        let validLatitude = latitude <= Constants.Values.RouteBorders.northBorder &&
+                latitude >= Constants.Values.RouteBorders.southBorder
+
+        let validLongitude = longitude <= Constants.Values.RouteBorders.eastBorder &&
+                longitude >= Constants.Values.RouteBorders.westBorder
+
+        return validLatitude && validLongitude
+    }
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let newCoord = locations.last?.coordinate {
-            bounds = bounds.includingCoordinate(newCoord)
+            // Only update the bounds to include the current location if it is within valid county extremes. Otherwise the map snaps to a random location outside of Ithaca.
+            if isValidCoordinate(latitude: newCoord.latitude, longitude: newCoord.longitude) {
+                bounds = bounds.includingCoordinate(newCoord)
+            }
+
             currentLocation = newCoord
         }
     }
@@ -169,7 +183,7 @@ extension RouteDetailContentViewController: GMSMapViewDelegate {
                     with: [
                     Constants.BusUserData.actualCoordinates: bus.position,
                     Constants.BusUserData.indicatorCoordinates: placement,
-                    Constants.BusUserData.vehicleID: getUserData(for: bus, key: Constants.BusUserData.vehicleID) as? Int ?? -1
+                    Constants.BusUserData.vehicleID: getUserData(for: bus, key: Constants.BusUserData.vehicleID) as? String ?? "-1"
                     ]
                 )
 
@@ -189,8 +203,8 @@ extension RouteDetailContentViewController {
             dataType: .validData,
             latitude: 42.4491411,
             longitude: -76.4836815,
-            routeID: 10,
-            vehicleID: 0
+            routeId: 10,
+            vehicleId: "0"
         )
         let coords = CLLocationCoordinate2D(latitude: 42.4491411, longitude: -76.4836815)
         let marker = GMSMarker(position: coords)

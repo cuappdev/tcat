@@ -1,5 +1,5 @@
 //
-//  Network+Endpoints.swift
+//  Endpoints.swift
 //  TCAT
 //
 //  Created by Austin Astorga on 4/6/17.
@@ -110,26 +110,22 @@ extension Endpoint {
         Endpoint.config.commonPath = "/api/v3"
         let departDirections = directions.filter { $0.type == .depart && $0.tripIdentifiers != nil }
 
-//        let locationsInfo = departDirections.map { direction -> BusLocationsInfo in
-//            // The id of the location, or bus stop, the bus needs to get to
-//            let stopID = direction.stops.first?.id ?? "-1"
-//            return BusLocationsInfo(stopID: stopID, routeID: String(direction.routeNumber), tripIdentifiers: direction.tripIdentifiers!)
-//        }
-        let locationsInfo = departDirections.flatMap { direction -> [BusLocationsInfoV3] in
+        let locationsInfo = departDirections.flatMap { direction -> [BusLocationsInfo] in
             return getBusLocationsInfo(direction: direction)
         }
 
-        let body = GetBusLocationsBodyV3(data: locationsInfo)
+        let body = GetBusLocationsBody(data: locationsInfo)
         return Endpoint(path: Constants.Endpoints.busLocations, body: body)
     }
 
-    static private func getBusLocationsInfo(direction: Direction) -> [BusLocationsInfoV3] {
+    // Returns an array of BusLocationsInfo elements, each corresponding to the direction's tripIdentifiers
+    static private func getBusLocationsInfo(direction: Direction) -> [BusLocationsInfo] {
         guard let tripIds = direction.tripIdentifiers else {
             return []
         }
 
-        let locationsInfo = tripIds.map({ tripId -> BusLocationsInfoV3 in
-            return BusLocationsInfoV3(routeId: String(direction.routeNumber), tripId: tripId)
+        let locationsInfo = tripIds.map({ tripId -> BusLocationsInfo in
+            return BusLocationsInfo(routeId: String(direction.routeNumber), tripId: tripId)
         })
 
         return locationsInfo
@@ -147,12 +143,6 @@ extension Endpoint {
         Endpoint.config.commonPath = "/api/v3"
         let body = TripBodyV3(data: trips)
         return Endpoint(path: Constants.Endpoints.delays, body: body)
-    }
-
-    static func getDelayUrl(tripId: String, stopId: String) -> String {
-        Endpoint.config.commonPath = "/api/v2"
-        let path = "delay"
-        return "\(String(describing: Endpoint.config.host))\(path)?stopID=\(stopId)&tripID=\(tripId)"
     }
 
 }
