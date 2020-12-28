@@ -132,8 +132,8 @@ extension RouteDetailContentViewController: GMSMapViewDelegate {
             bearingView.tag = increaseTapTargetTag
 
             if let existingIndicator = busIndicators.first(where: {
-                let markerID = getUserData(for: $0, key: Constants.BusUserData.vehicleID) as? Int
-                let busID = getUserData(for: bus, key: Constants.BusUserData.vehicleID) as? Int
+                let markerID = getUserData(for: $0, key: Constants.BusUserData.vehicleID) as? String
+                let busID = getUserData(for: bus, key: Constants.BusUserData.vehicleID) as? String
                 return markerID == busID
             }) { // Update Indicator
                 if let placement = calculatePlacement(position: bus.position, view: bearingView) {

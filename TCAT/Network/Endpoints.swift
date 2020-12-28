@@ -107,17 +107,32 @@ extension Endpoint {
     }
 
     static func getBusLocations(_ directions: [Direction]) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
+        Endpoint.config.commonPath = "/api/v3"
         let departDirections = directions.filter { $0.type == .depart && $0.tripIdentifiers != nil }
 
-        let locationsInfo = departDirections.map { direction -> BusLocationsInfo in
-            // The id of the location, or bus stop, the bus needs to get to
-            let stopID = direction.stops.first?.id ?? "-1"
-            return BusLocationsInfo(stopID: stopID, routeID: String(direction.routeNumber), tripIdentifiers: direction.tripIdentifiers!)
+//        let locationsInfo = departDirections.map { direction -> BusLocationsInfo in
+//            // The id of the location, or bus stop, the bus needs to get to
+//            let stopID = direction.stops.first?.id ?? "-1"
+//            return BusLocationsInfo(stopID: stopID, routeID: String(direction.routeNumber), tripIdentifiers: direction.tripIdentifiers!)
+//        }
+        let locationsInfo = departDirections.flatMap { direction -> [BusLocationsInfoV3] in
+            return getBusLocationsInfo(direction: direction)
         }
 
-        let body = GetBusLocationsBody(data: locationsInfo)
+        let body = GetBusLocationsBodyV3(data: locationsInfo)
         return Endpoint(path: Constants.Endpoints.busLocations, body: body)
+    }
+
+    static private func getBusLocationsInfo(direction: Direction) -> [BusLocationsInfoV3] {
+        guard let tripIds = direction.tripIdentifiers else {
+            return []
+        }
+
+        let locationsInfo = tripIds.map({ tripId -> BusLocationsInfoV3 in
+            return BusLocationsInfoV3(routeId: String(direction.routeNumber), tripId: tripId)
+        })
+
+        return locationsInfo
     }
 
     // Utilizes the /delays endpoint, only passing in the single trip of interest

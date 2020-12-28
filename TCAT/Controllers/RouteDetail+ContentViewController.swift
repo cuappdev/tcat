@@ -161,7 +161,7 @@ class RouteDetailContentViewController: UIViewController {
 
     // MARK: - Network Calls
 
-    private func busLocations(_ directions: [Direction]) -> Future<Response<[BusLocation]>> {
+    private func busLocations(_ directions: [Direction]) -> Future<Response<[BusLocationV3]>> {
         return networking(Endpoint.getBusLocations(directions)).decode()
     }
 
@@ -212,15 +212,15 @@ class RouteDetailContentViewController: UIViewController {
         bounceIndicators()
     }
 
-    private func parseBusLocationsData(data: [BusLocation]) {
+    private func parseBusLocationsData(data: [BusLocationV3]) {
         data.forEach { busLocation in
             switch busLocation.dataType {
             case .noData:
-                if !self.noDataRouteList.contains(busLocation.routeNumber) {
-                    self.noDataRouteList.append(busLocation.routeNumber)
+                if !self.noDataRouteList.contains(busLocation.routeId) {
+                    self.noDataRouteList.append(busLocation.routeId)
                 }
             case .invalidData:
-                if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
+                if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeId) {
                     self.noDataRouteList.remove(at: previouslyUnavailableRoute)
                 }
                 if self.noDataRouteList.isEmpty {
@@ -229,7 +229,7 @@ class RouteDetailContentViewController: UIViewController {
                 self.showBanner(Constants.Banner.trackingLater, status: .info)
 
             case .validData:
-                if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeNumber) {
+                if let previouslyUnavailableRoute = self.noDataRouteList.firstIndex(of: busLocation.routeId) {
                     self.noDataRouteList.remove(at: previouslyUnavailableRoute)
                 }
                 if self.noDataRouteList.isEmpty {
@@ -244,11 +244,12 @@ class RouteDetailContentViewController: UIViewController {
     /// If `validTripIDs` is passed in, only buses that match the tripID will be drawn.
     /// The input includes every bus associated with a certain line. Any visible indicators
     /// are also animated.
-    private func setBusLocation(_ bus: BusLocation) {
+    private func setBusLocation(_ bus: BusLocationV3) {
         // New bus coordinates
         let busCoords = CLLocationCoordinate2D(latitude: bus.latitude, longitude: bus.longitude)
         let existingBus = buses.first(where: {
-            return getUserData(for: $0, key: Constants.BusUserData.vehicleID) as? Int == bus.vehicleID
+//            return getUserData(for: $0, key: Constants.BusUserData.vehicleID) as? Int == bus.vehicleID
+            return getUserData(for: $0, key: Constants.BusUserData.vehicleID) as? String == bus.vehicleId
         })
 
         if let newBus = existingBus { // If bus is already on map, update and animate change
@@ -259,10 +260,14 @@ class RouteDetailContentViewController: UIViewController {
 
             newBus.appearAnimation = .none
 
+//            updateUserData(for: newBus, with: [
+//                Constants.BusUserData.actualCoordinates: busCoords,
+//                Constants.BusUserData.vehicleID: bus.vehicleID
+//                ])
             updateUserData(for: newBus, with: [
                 Constants.BusUserData.actualCoordinates: busCoords,
-                Constants.BusUserData.vehicleID: bus.vehicleID
-                ])
+                Constants.BusUserData.vehicleID: bus.vehicleId
+            ])
 
             // Position
             newBus.position = busCoords
@@ -274,10 +279,14 @@ class RouteDetailContentViewController: UIViewController {
             marker.appearAnimation = .pop
             marker.iconView = iconView
 
+//            updateUserData(for: marker, with: [
+//                Constants.BusUserData.actualCoordinates: busCoords,
+//                Constants.BusUserData.vehicleID: bus.vehicleID
+//                ])
             updateUserData(for: marker, with: [
                 Constants.BusUserData.actualCoordinates: busCoords,
-                Constants.BusUserData.vehicleID: bus.vehicleID
-                ])
+                Constants.BusUserData.vehicleID: bus.vehicleId
+            ])
 
             setIndex(of: marker, with: .bussing)
             marker.map = mapView
