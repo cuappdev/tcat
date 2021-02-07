@@ -30,16 +30,14 @@ extension Endpoint {
             Endpoint.config.scheme = "https"
         #endif
         Endpoint.config.host = baseURL
-        Endpoint.config.commonPath = "/api/v2"
+        Endpoint.config.commonPath = "/api/v3"
     }
 
     static func getAllStops() -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
         return Endpoint(path: Constants.Endpoints.allStops)
     }
 
     static func getAlerts() -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
         return Endpoint(path: Constants.Endpoints.alerts)
     }
 
@@ -59,8 +57,7 @@ extension Endpoint {
             originName: start.name,
             uid: uid
         )
-        Endpoint.config.commonPath = "/api/v2"
-        return Endpoint(path: Constants.Endpoints.getRoutes, body: body)
+        return Endpoint(path: "/api/v2\(Constants.Endpoints.getRoutes)", body: body, useCommonPath: false)
     }
 
     static func getMultiRoutes(
@@ -75,39 +72,28 @@ extension Endpoint {
             end: endCoords,
             destinationNames: endPlaceNames
         )
-        Endpoint.config.commonPath = "/api/v2"
-        return Endpoint(path: Constants.Endpoints.multiRoute, body: body)
-    }
-
-    static func getPlaceIDCoordinates(placeID: String) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
-        let body = PlaceIDCoordinatesBody(placeID: placeID)
-        return Endpoint(path: Constants.Endpoints.placeIDCoordinates, body: body)
+        return Endpoint(path: "/api/v2\(Constants.Endpoints.multiRoute)", body: body, useCommonPath: false)
     }
 
     static func getAppleSearchResults(searchText: String) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
         let body = SearchResultsBody(query: searchText)
         return Endpoint(path: Constants.Endpoints.appleSearch, body: body)
     }
 
     static func updateApplePlacesCache(searchText: String, places: [Place]) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
         let body = ApplePlacesBody(query: searchText, places: places)
         return Endpoint(path: Constants.Endpoints.applePlaces, body: body)
     }
 
     static func routeSelected(routeId: String) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v2"
         // Add unique identifier to request
         let uid = sharedUserDefaults?.string(forKey: Constants.UserDefaults.uid)
 
         let body = RouteSelectedBody(routeId: routeId, uid: uid)
-        return Endpoint(path: Constants.Endpoints.routeSelected, body: body)
+        return Endpoint(path: "/api/v2\(Constants.Endpoints.routeSelected)", body: body, useCommonPath: false)
     }
 
     static func getBusLocations(_ directions: [Direction]) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v3"
         let departDirections = directions.filter { $0.type == .depart && $0.tripIdentifiers != nil }
 
         let locationsInfo = departDirections.flatMap { direction -> [BusLocationsInfo] in
@@ -133,15 +119,13 @@ extension Endpoint {
 
     // Utilizes the /delays endpoint, only passing in the single trip of interest
     static func getDelay(tripID: String, stopID: String) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v3"
-        let trip = TripV3(stopId: stopID, tripId: tripID)
-        let body = TripBodyV3(data: [trip])
+        let trip = Trip(stopId: stopID, tripId: tripID)
+        let body = TripBody(data: [trip])
         return Endpoint(path: Constants.Endpoints.delays, body: body)
     }
 
-    static func getAllDelays(trips: [TripV3]) -> Endpoint {
-        Endpoint.config.commonPath = "/api/v3"
-        let body = TripBodyV3(data: trips)
+    static func getAllDelays(trips: [Trip]) -> Endpoint {
+        let body = TripBody(data: trips)
         return Endpoint(path: Constants.Endpoints.delays, body: body)
     }
 

@@ -33,10 +33,6 @@ internal struct MultiRoutesBody: Codable {
     let destinationNames: [String]
 }
 
-internal struct PlaceIDCoordinatesBody: Codable {
-    let placeID: String
-}
-
 internal struct SearchResultsBody: Codable {
     let query: String
 }
@@ -62,11 +58,6 @@ class RouteSectionsObject: Codable {
 }
 
 internal struct Trip: Codable {
-    let stopID: String
-    let tripID: String
-}
-
-internal struct TripV3: Codable {
     let stopId: String
     let tripId: String
 }
@@ -75,16 +66,7 @@ internal struct TripBody: Codable {
     var data: [Trip]
 }
 
-internal struct TripBodyV3: Codable {
-    var data: [TripV3]
-}
-
 internal struct Delay: Codable {
-    let tripID: String
-    let delay: Int?
-}
-
-internal struct DelayV3: Codable {
     let tripId: String
     let delay: Int?
 }

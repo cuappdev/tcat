@@ -240,7 +240,7 @@ class RouteDetailDrawerViewController: UIViewController {
         }
     }
 
-    private func getDelay(tripId: String, stopId: String) -> Future<Response<[DelayV3]>> {
+    private func getDelay(tripId: String, stopId: String) -> Future<Response<[Delay]>> {
         return networking(Endpoint.getDelay(tripID: tripId, stopID: stopId)).decode()
     }
 
